@@ -28,8 +28,16 @@ defmodule Floki.Traversal do
   end
 
   def traverse_and_update({elem, attrs, children}, fun) do
-    mapped_children = traverse_and_update(children, fun)
-    fun.({elem, attrs, mapped_children})
+    mapped_node = fun.({elem, attrs, children})
+
+    case mapped_node do
+      {mapped_elem, mapped_attrs, ^children} ->
+        mapped_children = traverse_and_update(children, fun)
+        {mapped_elem, mapped_attrs, mapped_children}
+
+      _ ->
+        mapped_node
+    end
   end
 
   def traverse_and_update(html_node, acc, fun)
